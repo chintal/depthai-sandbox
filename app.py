@@ -20,7 +20,7 @@ from qt_material import apply_stylesheet
 
 logging.basicConfig(level=logging.DEBUG)
 
-enable_nn=True
+enable_nn=False
 enable_aruco=True
 enable_depth=True
 enable_pointcloud=False
@@ -68,9 +68,8 @@ class AutoResizingWidget(QWidget):
 
 
 class App(QWidget):
-    def __init__(self, depthai_handler, dark_mode=False):
+    def __init__(self, depthai_handler):
         super().__init__()
-        self.dark_mode = dark_mode
         self.depthai_handler = depthai_handler
         self.initStats()
         self.initUI()
@@ -312,7 +311,7 @@ if __name__ == '__main__':
         depth_thresholds=depth_thresholds,
         depth_spatial_filter=depth_spatial_filter
     )
-    ui = App(depthai_handler, dark_mode=True)
+    ui = App(depthai_handler)
     ui.show()
 
     apply_stylesheet(app, theme='dark_teal.xml')
