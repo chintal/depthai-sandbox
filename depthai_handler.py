@@ -429,7 +429,7 @@ class DepthAIHandler:
 
                 if self.enable_depth:
                     aruco_spatials = {}
-                    self.latest_aruco_rois = self.roi.get_square_rois(
+                    self.latest_aruco_rois = self.roi.get_marker_rois(
                         self.latest_aruco_corners, fname=self.aruco_input, geom=self.geom
                     )
                     for idx, roi in enumerate(self.latest_aruco_rois):

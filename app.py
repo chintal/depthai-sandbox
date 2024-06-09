@@ -14,8 +14,9 @@ from PyQt6.QtCore import QTimer, Qt
 from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 from depthai_handler import DepthAIHandler, cleanup_depthai
 from vedo import Plotter
-from qflowlayout import QFlowLayout
-from qcustomsplitter import QCustomSplitter
+from widgets.qflowlayout import QFlowLayout
+from widgets.qcustomsplitter import QCustomSplitter
+from qt_material import apply_stylesheet
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -39,7 +40,6 @@ depth_spatial_filter = False
 # point from RGB to left is still pretty broken, though. 
 aruco_input='rgb'
 draw_aruco_on = ['disparity']
-
 
 
 # Function to convert OpenCV images to QPixmap for display in PyQt6
@@ -279,8 +279,7 @@ class App(QWidget):
         self.layout.addWidget(stats_container)
 
         self.resize(1000, 600)
-        self.applyTheme()
-
+        
         # Timer for updating frames
         self.timer = QTimer()
         self.timer.timeout.connect(self.updateFrames)
@@ -295,8 +294,6 @@ class App(QWidget):
         self.timer.start(30)
         adjust_width()
 
-    def applyTheme(self):
-        pass
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
@@ -315,8 +312,10 @@ if __name__ == '__main__':
         depth_thresholds=depth_thresholds,
         depth_spatial_filter=depth_spatial_filter
     )
-    ex = App(depthai_handler, dark_mode=True)
-    ex.show()
+    ui = App(depthai_handler, dark_mode=True)
+    ui.show()
+
+    apply_stylesheet(app, theme='dark_teal.xml')
     
     def close_app():
         cleanup_depthai(depthai_handler)

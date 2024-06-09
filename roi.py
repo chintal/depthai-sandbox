@@ -25,7 +25,7 @@ class ROICalculators:
                 y + default_roi_size/2
             ]
 
-    def get_square_roi(self, corners, fname=None, geom=None):
+    def get_marker_roi(self, corners, fname=None, geom=None):
         # Find min and max coordinates of the marker
         min_x = np.min(corners[:,:,0])
         max_x = np.max(corners[:,:,0])
@@ -53,8 +53,8 @@ class ROICalculators:
 
         return roi.astype(int)
 
-    def get_square_rois(self, markers, fname, geom=None):
+    def get_marker_rois(self, markers, fname, geom=None):
         rois = []
         for marker in markers:
-            rois.append(self.get_square_roi(marker))
+            rois.append(self.get_marker_roi(marker))
         return rois
