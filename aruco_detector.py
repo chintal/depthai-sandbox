@@ -23,11 +23,15 @@ class ArucoDetector:
         self.corners, self.ids, _ = self.detector.detectMarkers(use_frame)
         return self.corners, self.ids
 
-    def draw_markers(self, frame, is_grey=False):
+    def draw_markers(self, frame, rois=None, is_grey=False):
         if is_grey:
             frame = cv2.cvtColor(frame, cv2.COLOR_GRAY2BGR)
         if self.ids is not None:
             cv2.aruco.drawDetectedMarkers(frame, self.corners, self.ids)
+            if rois is not None:
+                for roi in rois:
+                    xmin, ymin, xmax, ymax = roi
+                    cv2.rectangle(frame, (xmin, ymin), (xmax, ymax), (0, 255, 0), 2)
         return frame
     
     def draw_markers_on(self, frame, coordinates, from_frame, to_frame):

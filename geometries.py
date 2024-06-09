@@ -45,32 +45,36 @@ Representing transformation matrices.
 
 """
 
-class ReferenceFramesManager(object):
+class GeometriesManager(object):
     def __init__(self) -> None:
         self.frame_sizes = {}
         self.intrinsics: Dict[str, np.ndarray] = {}
         self.dist_coeffs: Dict[str, np.ndarray] = {}
         self.extrinsics: Dict[str, np.ndarray] = {}
+        self.fov: Dict[str, float] = {}
 
     def print(self):
-        logging.info("#####   Frame Sizes  #####")
-        self.printInfo(self.frame_sizes)
-        logging.info("#####   Intrinsics  #####")
-        self.printInfo(self.intrinsics)
-        logging.info("#####   Dist Coeffs  #####")
-        self.printInfo(self.dist_coeffs)
-        logging.info("")
-        logging.info("#####   Extrinsics  #####")
-        self.printInfo(self.extrinsics)
-        logging.info("")
+        print("#####   Frame Sizes  #####")
+        print(self.frame_sizes)
+        print("#####   Intrinsics  #####")
+        print(self.intrinsics)
+        print("#####   Dist Coeffs  #####")
+        print(self.dist_coeffs)
+        print("")
+        print("#####   Extrinsics  #####")
+        print(self.extrinsics)
+        print("")
+        print("#####   FoV  #####")
+        print(self.fov)
+        print("")
 
     def printInfo(self, infodict):
         for key, value in infodict.items():
-            logging.info (f"--- {key} ----")
+            print (f"--- {key} ----")
             if isinstance(value, np.ndarray):
-                logging.info(np.array_str(value, precision=4, suppress_small=False))
+                print(np.array_str(value, precision=4, suppress_small=False))
             else:
-                logging.info(value)
+                print(value)
 
     def transformPoint(self, point, from_frame, to_frame):
         M_from = self.intrinsics[from_frame]

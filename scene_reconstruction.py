@@ -21,16 +21,16 @@ class RenderableObject(object):
 class RenderableCamera(RenderableObject):
     element_type = 'camera'
 
-    def __init__(self, coordinates, *args, **kwargs):
-        self.coordinates = coordinates
+    def __init__(self, geom, *args, **kwargs):
+        self.geom = geom
         super().__init__(*args, **kwargs)
 
     def render(self):
         if not self._elems:
             #TODO Render all camera origins with cones
-            camera_pos = (0, 0, 0)
-            self._elems.append(Box(pos=camera_pos, length=8, width=3, height=2, c="black"))
-            cone = Cone(axis=(0, 0, -1), height=100, r=120, res=100, pos=(0, 0, +50))
+            camera_pos = (0, 0, -10)
+            self._elems.append(Box(pos=camera_pos, length=80, width=30, height=20, c="black"))
+            cone = Cone(axis=(0, 0, -1), height=1000, r=1200, res=100, pos=(0, 0, +500))
             cone.color("lightgray").alpha(0.1)
             self._elems.append(cone)
         return self._elems
@@ -65,7 +65,7 @@ class RenderablePlane(RenderableObject):
 
     def render(self):
         if not self._elems:
-            self._elems.append(Plane(pos=self.centroid, normal=self.normal, s=(100,100),
+            self._elems.append(Plane(pos=self.centroid, normal=self.normal, s=(1000,1000),
                                      c=self.color, alpha=0.4))
         return self._elems
 
@@ -76,8 +76,9 @@ class RenderablePlane(RenderableObject):
 class RenderableMarker(RenderableObject):
     element_type = 'marker'
 
-    def __init__(self, tvec, size=5, *args, **kwargs):
-        self._tvec = tvec
+    def __init__(self, tvec, size=50, *args, **kwargs):
+        self._tvec = None
+        self.tvec = tvec
         self.size = size
         super().__init__(*args, **kwargs)
 
@@ -87,7 +88,9 @@ class RenderableMarker(RenderableObject):
     
     @tvec.setter
     def tvec(self, value):
-        if not np.array_equal(value, self._tvec):
+        if isinstance(value, dict):
+            value = np.array([value['x'], value['y'], value['z']])
+        if self._tvec is None or not np.array_equal(value, self._tvec):
             self._elems = []
         self._tvec = value
 
@@ -107,13 +110,6 @@ class SceneReconstruction(object):
         self.elements = {}
         self._target : Plotter = None
 
-    def compute_average_plane(self, tvecs):
-        points = np.array(tvecs).reshape(-1, 3)
-        centroid = np.mean(points, axis=0)
-        _, _, Vt = np.linalg.svd(points - centroid)
-        plane_normal = Vt[2, :]
-        return centroid, plane_normal
-
     def _clear_elements(self, name):
         to_remove = []
         for e in self.elements.keys():
@@ -122,17 +118,19 @@ class SceneReconstruction(object):
         for e in to_remove:
             del self.elements[e]
 
-    def upsert_camera(self, coordinates):
+    def upsert_camera(self, geom):
         if 'camera' in self.elements.keys():
             # We assume the coordinate systems are fixed. 
             pass
         else:
-            self.elements['camera'] = RenderableCamera(name='camera', coordinates=coordinates)
+            self.elements['camera'] = RenderableCamera(name='camera', geom=geom)
 
     def clear_plane(self, name):
         self._clear_elements(name)
 
     def upsert_plane(self, name, centroid, normal, color=None):
+        if centroid is None or normal is None:
+            return
         if name in self.elements.keys():
             self.elements[name].centroid = centroid
             self.elements[name].normal = normal
